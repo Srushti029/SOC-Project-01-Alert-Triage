@@ -1,7 +1,8 @@
 # SOC-Project-01-Alert-Triage
-SOC investigation of suspicious Windows authentication activity using synthetic security logs.
 
-The investigation focuses on identifying abnormal authentication behaviour, correlating source IP addresses with user accounts, reconstructing the event timeline, classifying the alert, and recommending an appropriate response.
+SOC investigation of suspicious Windows authentication activity using a synthetic security-log dataset.
+
+This investigation focuses on identifying abnormal authentication behaviour, correlating source IP addresses and user accounts, reconstructing the event timeline, assessing the alert, and recommending an appropriate response.
 
 ## Objective
 
@@ -9,8 +10,8 @@ The investigation focuses on identifying abnormal authentication behaviour, corr
 - Identify abnormal login patterns
 - Correlate source IP addresses and user accounts
 - Reconstruct the incident timeline
-- Classify the security alert
-- Assess severity
+- Assess and classify the security alert
+- Determine an appropriate severity
 - Recommend an appropriate response
 
 ## Environment
@@ -25,7 +26,7 @@ The investigation was performed using a small synthetic Windows authentication l
 
 The dataset simulates authentication failures, successful logons, multiple user accounts, and source-IP activity.
 
-No real organizational logs, credentials, or sensitive information were used.
+No real organisational logs, credentials, or sensitive information were used.
 
 ## Investigation Process
 
@@ -37,19 +38,17 @@ The investigation focused on:
 2. Successful authentication following failed attempts
 3. Activity involving multiple accounts
 4. Source-IP correlation
-5. Differences between authentication patterns
+5. Comparison of authentication patterns across source IPs
 
 ## Key Findings
 
-Source IP `10.10.20.15` generated repeated failed authentication attempts against the `srushti` account.
+Source IP `10.10.20.15` generated **seven failed authentication attempts** against the `srushti` account between `08:41:12` and `08:42:03`.
 
-A total of **seven failed logon attempts** were observed between `08:41:12` and `08:42:03`, followed by a successful logon at `08:42:17`.
+A successful logon for `srushti` occurred at `08:42:17`, **14 seconds after the final failed attempt**.
 
-This created a **14-second gap between the final failed attempt and the successful authentication**.
+The same source IP also generated **five failed authentication attempts** against the `admin` account, indicating authentication activity involving multiple accounts.
 
-The same source IP also generated failed authentication attempts against the `admin` account, indicating activity involving multiple accounts.
-
-By comparison, `10.10.20.44` showed successful logons and logoffs for `srushti` and a SYSTEM special-privilege event, with no failed authentication attempts in the provided dataset.
+By comparison, `10.10.20.44` showed successful logons and logoffs for `srushti`, along with a SYSTEM special-privilege event, with no failed authentication attempts in the provided dataset.
 
 ## Analysis
 
@@ -57,7 +56,13 @@ The sequence of repeated failed authentication attempts followed by a successful
 
 The presence of authentication failures against multiple accounts from the same source IP increases the level of concern and makes `10.10.20.15` the primary source requiring further investigation.
 
-The logs alone do not prove attacker identity or definitively establish account compromise, so additional evidence would be required.
+The available logs do not prove attacker identity or definitively establish account compromise. Additional telemetry would be required to confirm the extent of any unauthorised access.
+
+## Result
+
+The investigation identified `10.10.20.15` as the primary source associated with suspicious authentication activity.
+
+The alert was assessed as a **True Positive** with **High severity**, based on the repeated failed logons, subsequent successful authentication, and activity involving multiple accounts.
 
 ## Final Assessment
 
@@ -68,7 +73,7 @@ The logs alone do not prove attacker identity or definitively establish account 
 | Primary Source IP | `10.10.20.15` |
 | Affected Accounts | `srushti`, `admin` |
 | Likely Activity | Password guessing / brute-force |
-| Confidence | High |
+| Confidence | **Moderate–High** |
 
 ## Recommended Response
 
@@ -77,21 +82,21 @@ The logs alone do not prove attacker identity or definitively establish account 
 - Review additional authentication and endpoint telemetry around the suspicious timeframe.
 - Investigate the `admin` account for additional activity.
 - Consider temporary source restriction or host isolation if further evidence confirms malicious activity.
-- Reset affected credentials if compromise is confirmed.
+- Reset affected credentials if unauthorised access or compromise is confirmed.
 
 ## Evidence
 
-### Authentication Log Analysis
+### Authentication Analysis
 
-![Authentication Log Analysis](screenshots/01-investigation-notes.png)
+![Authentication Analysis](screenshots/01-authentication-analysis.jpeg)
 
 ### Source IP Correlation
 
-![Source IP Correlation](screenshots/02-ip-correlation.png)
+![Source IP Correlation](screenshots/02-source-ip-correlation.jpeg)
 
 ### Final Assessment
 
-![Final Assessment](screenshots/03-final-verdict.png)
+![Final Assessment](screenshots/03-final-verdict.jpeg)
 
 ## Limitations
 
